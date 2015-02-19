@@ -1,7 +1,11 @@
 (ns websanjaya.core
-  (:gen-class))
+  (:require [ring.adapter.jetty :as rjetty]))
+
+(defn app-handler [request]
+  {:status 200
+   :headers {"Content-Type" "text/html"}
+   :body "Hello from Ring"})
 
 (defn -main
-  "I don't do a whole lot ... yet."
   [& args]
-  (println "Hello, World!"))
+  (rjetty/run-jetty app-handler {:port 4000}))
