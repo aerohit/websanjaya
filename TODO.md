@@ -5,7 +5,9 @@
     [*] Create an hello world html page.
     [*] Create an html page with cljs.
     [*] Hookup reagent to create elements on the page.
-    [ ] Add figwheel dependency.
+    [*] Hookup figwheel to hot load code changes.
+    [ ] Hookup figwheel to listen to changes in html and css.
+    [ ] Create an optimized production cljsbuild.
 
 ## Reference
 
