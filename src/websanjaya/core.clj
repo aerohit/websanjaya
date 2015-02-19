@@ -3,15 +3,15 @@
             [compojure.route :as route]
             [compojure.handler :as handler]
             [compojure.response :refer [render]]
+            [ring.middleware.json :as json]
+            [ring.util.response :refer [resource-response response]]
             [clojure.java.io :as io]))
 
 (defn json-response [data & [status]]
-  {:status (or status 200)
-   :headers {"Content-Type" "application/json; charset=utf-8"}
-   :body (str "{\"data\": \"some message\"}")})
+  (response {:data "Greetings from HN"}))
 
 (defn home [request]
-  (render (io/resource "index.html") request))
+  (resource-response "index.html"))
 
 (defn hacker-news []
   "Response from hacker news")
@@ -30,7 +30,10 @@
            (GET "/reddit" request (json-response (reddit)))
            (ANY "*" [] (route/not-found "Endpoint doesn't exist"))))
 
-(def rest-api (handler/api api-routes))
+(def rest-api (-> (handler/api api-routes)
+                  (json/wrap-json-body)
+                  (json/wrap-json-response)))
+
 (def site (handler/site site-routes))
 
 (def site-and-api (routes rest-api site))
