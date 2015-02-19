@@ -2,7 +2,8 @@
 
     [*] Create hello world page with just ring.
     [*] Create a hello world page with compojure.
-    [ ] Add cljs dependency.
+    [*] Create an hello world html page.
+    [ ] Create an html page with cljs.
     [ ] Add reagent dependency.
     [ ] Add figwheel dependency.
 
