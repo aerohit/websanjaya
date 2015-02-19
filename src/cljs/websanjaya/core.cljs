@@ -1,21 +1,35 @@
 (ns websanjaya.core
-  (:require [reagent.core :as reagent]
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [reagent.core :as reagent :refer [atom]]
             [figwheel.client :as fw]
+            [cljs.core.async :refer [<!]]
             [cljs-http.client :as http]))
 
-(def ^:const *HN_URL* "/hacker-news")
+(def ^:const *HN_URL* "/api/hacker-news")
+
+(defonce hn-response (atom nil))
+
 (defn scrape-hn []
-  (let [hn-content (http/get *HN_URL*)]
-    (println (keys hn-content))))
+  (go (let [hn-content (<! (http/get *HN_URL*))]
+        (reset! hn-response (:data (:body hn-content))))))
+
+(defn hn-message []
+  (when @hn-response
+    [:p "Inner Message from HN: "
+     [:span @hn-response]]))
 
 (defn hacker-news []
-  (scrape-hn)
   [:div.hacker-news "Hacker News"
+   [hn-message]
    [:ul
     [:li "Item 1"]
     [:li "Item 2"]]])
 
+(defn init-data []
+  (scrape-hn))
+
 (defn main []
+  (init-data)
   (reagent/render-component [hacker-news]
                             (.getElementById js/document "reagent-root")))
 
