@@ -12,7 +12,9 @@
                  [reagent "0.5.0-alpha3"]
                  [figwheel "0.2.3-SNAPSHOT"]
                  [cljs-http "0.1.26"]
-                 [ring/ring-json "0.3.1"]]
+                 [ring/ring-json "0.3.1"]
+                 [clj-http "1.0.1"]
+                 [enlive "1.1.5"]]
   :main ^:skip-aot websanjaya.core
   :target-path "target/%s"
   :plugins [[lein-cljsbuild "1.0.4"]

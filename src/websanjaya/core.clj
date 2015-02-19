@@ -5,16 +5,35 @@
             [compojure.response :refer [render]]
             [ring.middleware.json :as json]
             [ring.util.response :refer [resource-response response]]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io]
+            [clj-http.client :as client]
+            [net.cgrand.enlive-html :as html]))
+
+(def ^:dynamic *HN_URL* "https://news.ycombinator.com/")
 
 (defn json-response [data & [status]]
-  (response {:data "Greetings from HN"}))
+  (response {:data data}))
 
 (defn home [request]
   (resource-response "index.html"))
 
+; TODO: make this asynchronous
+; TODO: also figure out why doesn't clj-http.client doesn't work
+(defn get-response [url]
+  ;(html/html-resource (client/get url))
+  (html/html-resource (java.net.URL. url)))
+
+(defn hn-title-url [node]
+  {:title (html/text node)
+   :url (:href (:attrs node))})
+
+(defn parse-hacker-news [content]
+  (map hn-title-url (html/select content [:td.title :a])))
+
+; TODO: make this asynchronous
 (defn hacker-news []
-  "Response from hacker news")
+  (let [response (get-response *HN_URL*)]
+    (parse-hacker-news response)))
 
 (defn reddit []
   "Response from reddit")

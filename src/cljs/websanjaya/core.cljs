@@ -13,17 +13,20 @@
   (go (let [hn-content (<! (http/get *HN_URL*))]
         (reset! hn-response (:data (:body hn-content))))))
 
+(defn hn-link [node]
+  [:p {:key (:title node)}
+   [:a {:href (:url node)}
+    (:title node)]])
+
 (defn hn-message []
   (when @hn-response
-    [:p "Inner Message from HN: "
-     [:span @hn-response]]))
+    [:div
+     [:p "Latest posts on HN:"]
+     (map hn-link (take 5 @hn-response))]))
 
 (defn hacker-news []
   [:div.hacker-news "Hacker News"
-   [hn-message]
-   [:ul
-    [:li "Item 1"]
-    [:li "Item 2"]]])
+   [hn-message]])
 
 (defn init-data []
   (scrape-hn))
