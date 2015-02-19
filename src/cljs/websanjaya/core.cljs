@@ -1,8 +1,15 @@
 (ns websanjaya.core
   (:require [reagent.core :as reagent]
-            [figwheel.client :as fw]))
+            [figwheel.client :as fw]
+            [cljs-http.client :as http]))
+
+(def ^:const *HN_URL* "/hacker-news")
+(defn scrape-hn []
+  (let [hn-content (http/get *HN_URL*)]
+    (println (keys hn-content))))
 
 (defn hacker-news []
+  (scrape-hn)
   [:div.hacker-news "Hacker News"
    [:ul
     [:li "Item 1"]

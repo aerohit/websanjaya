@@ -10,6 +10,10 @@ Crawls nerd websites like HN, Reddit for nerdy topics.
 
     lein run
 
+or
+
+    lein ring server 4000
+
 #### Start cljs compiler
 
 Run either:

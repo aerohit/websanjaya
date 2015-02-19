@@ -9,11 +9,14 @@
                  [org.clojure/clojurescript "0.0-2850"]
                  [compojure "1.3.1"]
                  [reagent "0.5.0-alpha3"]
-                 [figwheel "0.2.3-SNAPSHOT"]]
+                 [figwheel "0.2.3-SNAPSHOT"]
+                 [cljs-http "0.1.26"]
+                 [ring/ring-json "0.3.1"]]
   :main ^:skip-aot websanjaya.core
   :target-path "target/%s"
   :plugins [[lein-cljsbuild "1.0.4"]
-            [lein-figwheel "0.2.3-SNAPSHOT"]]
+            [lein-figwheel "0.2.3-SNAPSHOT"]
+            [lein-ring "0.9.1"]]
   :cljsbuild {:builds
               [{:id "dev"
                 :source-paths ["src/cljs"]
@@ -28,4 +31,5 @@
                            :preamble  ["reagent/react.js"]}}]}
   :figwheel {:server-port 4449
              :server-logfile "logs/figwheel_server.log"}
+  :ring {:handler websanjaya.core/site-and-api}
   :profiles {:uberjar {:aot :all}})
