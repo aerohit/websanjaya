@@ -7,7 +7,8 @@
                  [ring "1.3.2"]
                  [ring/ring-defaults "0.1.4"]
                  [org.clojure/clojurescript "0.0-2850"]
-                 [compojure "1.3.1"]]
+                 [compojure "1.3.1"]
+                 [reagent "0.5.0-alpha3"]]
   :main ^:skip-aot websanjaya.core
   :target-path "target/%s"
   :plugins [[lein-cljsbuild "1.0.4"]]
@@ -21,5 +22,6 @@
                            :asset-path "/static/js/out"
                            :warnings true
                            :main "websanjaya.core"
-                           :pretty-print true}}]}
+                           :pretty-print true
+                           :preamble  ["reagent/react.js"]}}]}
   :profiles {:uberjar {:aot :all}})

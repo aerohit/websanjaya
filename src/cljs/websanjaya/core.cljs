@@ -1,12 +1,15 @@
-(ns websanjaya.core)
+(ns websanjaya.core
+  (:require [reagent.core :as reagent]))
 
-(defn set-html! [el content]
-  (set! (.-innerHTML el) content))
+(defn hacker-news []
+  [:div.hacker-news "Hacker News"
+   [:ul
+    [:li "Item 1"]
+    [:li "Item 2"]]])
 
 (defn main []
-  (let [content "Hello World from Clojure Script"
-        element (aget (js/document.getElementsByTagName "main") 0)]
-    (set-html! element content)))
+  (reagent/render-component [hacker-news]
+                            (.getElementById js/document "reagent-root")))
 
 (enable-console-print!)
 (main)
