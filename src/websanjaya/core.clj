@@ -35,8 +35,21 @@
   (let [response (get-response *HN_URL*)]
     (parse-hacker-news response)))
 
-(defn reddit []
-  "Response from reddit")
+(defn reddit-url-for [topic]
+  (str "http://www.reddit.com/r/" topic))
+
+(defn reddit-title-url [node]
+  {:title (html/text node)
+   :url (:href (:attrs node))})
+
+(defn parse-reddit [content]
+  (map reddit-title-url (html/select content [:a.title.may-blank])))
+
+; Reddit throws 429, bastard!
+(defn reddit [topic]
+  (let [;response (get-response (reddit-url-for topic))
+        response (html/html-resource (java.io.StringReader. (slurp "vim.html")))]
+    (parse-reddit response)))
 
 (defroutes site-routes
   (GET "/"            [] home)
@@ -46,7 +59,7 @@
 (defroutes api-routes
   (context "/api" []
            (GET "/hacker-news" request (json-response (hacker-news)))
-           (GET "/reddit" request (json-response (reddit)))
+           (GET "/reddit/:topic" [topic] (json-response (reddit topic)))
            (ANY "*" [] (route/not-found "Endpoint doesn't exist"))))
 
 (def rest-api (-> (handler/api api-routes)
