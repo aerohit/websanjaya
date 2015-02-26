@@ -6,8 +6,8 @@
     [*] Create an html page with cljs.
     [*] Hookup reagent to create elements on the page.
     [*] Hookup figwheel to hot load code changes.
-    [ ] Scrape HN and show content.
-    [ ] Hookup figwheel to listen to changes in html and css.
+    [*] Scrape HN and show content.
+    [*] Hookup figwheel to listen to changes in html and css.
     [ ] Create an optimized production cljsbuild.
 
 ## Reference
