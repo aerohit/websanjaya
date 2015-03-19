@@ -29,7 +29,7 @@
                            :optimizations :none
                            :asset-path "/static/js/out"
                            :warnings true
-                           :main "websanjaya.core"
+                           :main "websanjaya.maps"
                            :pretty-print true
                            :preamble  ["reagent/react.js"]}}]}
   :figwheel {:server-port 4449
