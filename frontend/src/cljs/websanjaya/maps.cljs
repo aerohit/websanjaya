@@ -5,10 +5,10 @@
             [cljs.core.async :refer [<!]]
             [cljs-http.client :as http]))
 
-(defonce dyn-map (atom false))
+(defonce prices-map (atom false))
 
-(def acco-icon-url "//www.vakantiediscounter.nl/atomic/images/pin-acco-small.png")
-(def *some-url* "/api/pricerequest")
+(def icon-url "//www.vakantiediscounter.nl/atomic/images/pin-acco-small.png")
+(def *price-endpoint* "/api/pricerequest")
 (def *req-params* {:departuredate "2015-06-19"
                    :city "madrid"
                    :flexibility 2
@@ -23,18 +23,18 @@
   (js/google.maps.LatLng. (js/parseFloat 52.366667)
                           (js/parseFloat 4.9)))
 
-(defn gen-dyn-map-args [& {:as extra-opts}]
+(defn gen-prices-map-args [& {:as extra-opts}]
   (clj->js (merge {:center ams-location
                    :zoom 3
                    :scrollwheel false
                    :draggable false} extra-opts)))
 
-(defn init-dyn-map! []
-  (let [new-dyn-map (js/google.maps.Map.
+(defn init-prices-map! []
+  (let [new-prices-map (js/google.maps.Map.
                       (js/document.getElementById "googlemap")
-                      (gen-dyn-map-args))]
-    (reset! dyn-map new-dyn-map)
-    new-dyn-map))
+                      (gen-prices-map-args))]
+    (reset! prices-map new-prices-map)
+    new-prices-map))
 
 (defn position-for [location]
   (js/google.maps.LatLng. (js/parseFloat (:latitude location))
@@ -44,17 +44,16 @@
   (str (:label (:city data)) " - " (:price data) " euros"))
 
 (defn add-marker [data]
-  (println data)
   (let [new-marker (js/google.maps.Marker.
                      (clj->js
                        {:position (position-for (:location data))
                         :title (title-for-marker data)
-                        :icon {:url acco-icon-url}}))]
-    (.setMap new-marker @dyn-map)))
+                        :icon {:url icon-url}}))]
+    (.setMap new-marker @prices-map)))
 
 (defn price-for [city]
   (let [query-params (merge *req-params* {:city city})]
-    (go (let [price-response (<! (http/get *some-url* {:query-params query-params}))
+    (go (let [price-response (<! (http/get *price-endpoint* {:query-params query-params}))
               data (:data (:body price-response))]
           (add-marker data)))))
 
@@ -65,7 +64,7 @@
   (with-meta
     (fn []
       [:div#googlemap])
-    {:component-did-mount init-dyn-map!}))
+    {:component-did-mount init-prices-map!}))
 
 (defn component []
   [:div
