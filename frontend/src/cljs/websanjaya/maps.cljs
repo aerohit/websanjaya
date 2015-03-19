@@ -5,10 +5,11 @@
             [cljs.core.async :refer [<!]]
             [cljs-http.client :as http]))
 
-(def acco-icon-url "//www.vakantiediscounter.nl/atomic/images/pin-acco-small.png")
+(defonce dyn-map (atom false))
 
-(def *url-params* {:departuredate "2015-04-19"
-                   ;:city "barcelona"
+(def acco-icon-url "//www.vakantiediscounter.nl/atomic/images/pin-acco-small.png")
+(def *some-url* "/api/pricerequest")
+(def *req-params* {:departuredate "2015-06-19"
                    :city "madrid"
                    :flexibility 2
                    :room "2_0_0"
@@ -16,60 +17,62 @@
                    :transporttype "VL"
                    :trip_duration_range "6-10"})
 
-(def *some-url* "/api/pricerequest")
+(def cities ["barcelona" "madrid" "rome"])
 
-(defn fetch-price []
-  (go (let [price-response (<! (http/get *some-url* {:query-params *url-params*}))]
-        (println price-response))))
-
-(defonce dyn-map (atom false))
-(defonce marker  (atom false))
-
-(defn gen-position []
-  (js/google.maps.LatLng. (js/parseFloat -34.397)
-                          (js/parseFloat 150.644)))
+(def ams-location
+  (js/google.maps.LatLng. (js/parseFloat 52.366667)
+                          (js/parseFloat 4.9)))
 
 (defn gen-dyn-map-args [& {:as extra-opts}]
-  (clj->js (merge {:center (gen-position)
-                   :zoom 13
+  (clj->js (merge {:center ams-location
+                   :zoom 3
                    :scrollwheel false
                    :draggable false} extra-opts)))
 
 (defn init-dyn-map! []
-  (println :init-dyn-map!)
   (let [new-dyn-map (js/google.maps.Map.
                       (js/document.getElementById "googlemap")
                       (gen-dyn-map-args))]
     (reset! dyn-map new-dyn-map)
     new-dyn-map))
 
-(defn init-dyn-marker! [dyn-map]
+(defn position-for [location]
+  (js/google.maps.LatLng. (js/parseFloat (:latitude location))
+                          (js/parseFloat (:longitude location))))
+
+(defn title-for-marker [data]
+  (str (:label (:city data)) " - " (:price data) " euros"))
+
+(defn add-marker [data]
+  (println data)
   (let [new-marker (js/google.maps.Marker.
                      (clj->js
-                       {:position (gen-position)
-                        :title (:name "Google flights")
+                       {:position (position-for (:location data))
+                        :title (title-for-marker data)
                         :icon {:url acco-icon-url}}))]
-    (reset! marker new-marker)
-    (.setMap new-marker dyn-map)
-    new-marker))
+    (.setMap new-marker @dyn-map)))
 
-(defn init-dyn-all! []
-  (-> (init-dyn-map!)
-      (init-dyn-marker!))
-  true)
+(defn price-for [city]
+  (let [query-params (merge *req-params* {:city city})]
+    (go (let [price-response (<! (http/get *some-url* {:query-params query-params}))
+              data (:data (:body price-response))]
+          (add-marker data)))))
+
+(defn fetch-prices []
+  (doall (map price-for cities)))
 
 (def maps-component
   (with-meta
     (fn []
       [:div#googlemap])
-    {:component-did-mount init-dyn-all!}))
+    {:component-did-mount init-dyn-map!}))
 
 (defn component []
   [:div
    [maps-component]])
 
 (defn init-data []
-  (fetch-price))
+  (fetch-prices))
 
 (defn main []
   (init-data)
