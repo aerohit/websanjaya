@@ -13,6 +13,7 @@
                  [figwheel "0.2.3-SNAPSHOT"]
                  [cljs-http "0.1.26"]
                  [ring/ring-json "0.3.1"]
+                 [org.clojure/data.json "0.2.6"]
                  [clj-http "1.0.1"]
                  [enlive "1.1.5"]]
   :main ^:skip-aot websanjaya.core

@@ -7,6 +7,21 @@
 
 (def acco-icon-url "//www.vakantiediscounter.nl/atomic/images/pin-acco-small.png")
 
+(def *url-params* {:departuredate "2015-04-19"
+                   ;:city "barcelona"
+                   :city "madrid"
+                   :flexibility 2
+                   :room "2_0_0"
+                   :sort "price_asc"
+                   :transporttype "VL"
+                   :trip_duration_range "6-10"})
+
+(def *some-url* "/api/pricerequest")
+
+(defn fetch-price []
+  (go (let [price-response (<! (http/get *some-url* {:query-params *url-params*}))]
+        (println price-response))))
+
 (defonce dyn-map (atom false))
 (defonce marker  (atom false))
 
@@ -33,7 +48,7 @@
                      (clj->js
                        {:position (gen-position)
                         :title (:name "Google flights")
-                        :icon {:url        acco-icon-url}}))]
+                        :icon {:url acco-icon-url}}))]
     (reset! marker new-marker)
     (.setMap new-marker dyn-map)
     new-marker))
@@ -46,15 +61,18 @@
 (def maps-component
   (with-meta
     (fn []
-      [:section.googlemap
-       [:div#googlemap]])
+      [:div#googlemap])
     {:component-did-mount init-dyn-all!}))
 
 (defn component []
   [:div
    [maps-component]])
 
+(defn init-data []
+  (fetch-price))
+
 (defn main []
+  (init-data)
   (reagent/render-component [component]
                             (.getElementById js/document "reagent-root")))
 

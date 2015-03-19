@@ -4,12 +4,15 @@
             [compojure.handler :as handler]
             [compojure.response :refer [render]]
             [ring.middleware.json :as json]
+            [clojure.data.json :as djson]
             [ring.util.response :refer [resource-response response]]
             [clojure.java.io :as io]
             [clj-http.client :as client]
             [net.cgrand.enlive-html :as html]))
 
 (def ^:dynamic *HN_URL* "https://news.ycombinator.com/")
+
+(def ^:dynamic *api-url* "http://localhost:3000/api/search_results")
 
 (defn json-response [data & [status]]
   (response {:data data}))
@@ -51,6 +54,18 @@
         response (html/html-resource (java.io.StringReader. (slurp "vim.html")))]
     (parse-reddit response)))
 
+(defn process-price-response [price-response]
+  (let [acco (first (get (djson/read-str (:body price-response)) "accommodations"))]
+    {:location (get acco "location")
+     :city (get acco "city")
+     :price (get (get acco "cheapestoffer") "price")}))
+
+(defn price-request [request]
+  (println (:params request))
+  (let [price-response (client/get *api-url* {:query-params (:params request)})]
+    (println (process-price-response price-response))
+    (process-price-response price-response)))
+
 (defroutes site-routes
   (GET "/"            [] home)
   (route/resources "/static")
@@ -60,6 +75,7 @@
   (context "/api" []
            (GET "/hacker-news" request (json-response (hacker-news)))
            (GET "/reddit/:topic" [topic] (json-response (reddit topic)))
+           (GET "/pricerequest" request (json-response (price-request request)))
            (ANY "*" [] (route/not-found "Endpoint doesn't exist"))))
 
 (def rest-api (-> (handler/api api-routes)
