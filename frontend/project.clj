@@ -25,6 +25,7 @@
                 :source-paths ["src/cljs"]
                 :compiler {:output-to "resources/public/js/app.js"
                            :output-dir "resources/public/js/out"
+                           :externs ["google_maps_api_v3.js"]
                            :source-map true
                            :optimizations :none
                            :asset-path "/static/js/out"

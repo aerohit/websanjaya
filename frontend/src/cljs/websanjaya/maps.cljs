@@ -5,9 +5,54 @@
             [cljs.core.async :refer [<!]]
             [cljs-http.client :as http]))
 
+(def acco-icon-url "//www.vakantiediscounter.nl/atomic/images/pin-acco-small.png")
+
+(defonce dyn-map (atom false))
+(defonce marker  (atom false))
+
+(defn gen-position []
+  (js/google.maps.LatLng. (js/parseFloat -34.397)
+                          (js/parseFloat 150.644)))
+
+(defn gen-dyn-map-args [& {:as extra-opts}]
+  (clj->js (merge {:center (gen-position)
+                   :zoom 13
+                   :scrollwheel false
+                   :draggable false} extra-opts)))
+
+(defn init-dyn-map! []
+  (println :init-dyn-map!)
+  (let [new-dyn-map (js/google.maps.Map.
+                      (js/document.getElementById "googlemap")
+                      (gen-dyn-map-args))]
+    (reset! dyn-map new-dyn-map)
+    new-dyn-map))
+
+(defn init-dyn-marker! [dyn-map]
+  (let [new-marker (js/google.maps.Marker.
+                     (clj->js
+                       {:position (gen-position)
+                        :title (:name "Google flights")
+                        :icon {:url        acco-icon-url}}))]
+    (reset! marker new-marker)
+    (.setMap new-marker dyn-map)
+    new-marker))
+
+(defn init-dyn-all! []
+  (-> (init-dyn-map!)
+      (init-dyn-marker!))
+  true)
+
+(def maps-component
+  (with-meta
+    (fn []
+      [:section.googlemap
+       [:div#googlemap]])
+    {:component-did-mount init-dyn-all!}))
+
 (defn component []
   [:div
-   [:h1 "Maps will be here"]])
+   [maps-component]])
 
 (defn main []
   (reagent/render-component [component]
