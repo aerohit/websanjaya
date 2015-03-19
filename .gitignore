@@ -1,4 +1,4 @@
-/target
+frontend/target
 /classes
 /checkouts
 pom.xml
@@ -7,5 +7,5 @@ pom.xml.asc
 *.class
 /.lein-*
 /.nrepl-port
-/resources/public
-/logs
+frontend/resources/public
+frontend/logs
