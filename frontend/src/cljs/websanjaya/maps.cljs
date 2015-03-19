@@ -17,7 +17,7 @@
                    :transporttype "VL"
                    :trip_duration_range "6-10"})
 
-(def cities ["barcelona" "madrid" "rome"])
+(def cities ["rome" "barcelona" "lissabon" "istanbul" "new_york_city" "londen" "valencia" "praag"])
 
 (def ams-location
   (js/google.maps.LatLng. (js/parseFloat 52.366667)
@@ -44,10 +44,12 @@
   (str (:label (:city data)) " - " (:price data) " euros"))
 
 (defn add-marker [data]
-  (let [new-marker (js/google.maps.Marker.
+  (let [new-marker (js/MarkerWithLabel.
                      (clj->js
                        {:position (position-for (:location data))
                         :title (title-for-marker data)
+                        :labelContent (title-for-marker data)
+                        :labelClass "labels"
                         :icon {:url icon-url}}))]
     (.setMap new-marker @prices-map)))
 
