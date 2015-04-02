@@ -9,3 +9,4 @@ pom.xml.asc
 /.nrepl-port
 frontend/resources/public
 frontend/logs
+TODO.md
