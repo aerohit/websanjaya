@@ -68,6 +68,26 @@
       [:div#googlemap])
     {:component-did-mount init-prices-map!}))
 
+(defn calendar []
+  [:div [:h1 "Holidays!"]
+   [:input#example1 {:type "text" :placeholder "Select a date"}]])
+
+(defn calendar-did-mount []
+  (let [options {:format "dd/mm/yyyy"
+                 :autoclose true}
+        elem (js/$ "#example1")]
+    (.ready (js/$ js/document)
+            (fn []
+              (-> elem
+                  (.datepicker (clj->js options))
+                  (.on "changeDate" (fn [e] (prn (subs (.toISOString (.-date e)) 0 10)))))))))
+
+(defn calendar-component []
+  (reagent/create-class {:reagent-render calendar
+                         :component-did-mount calendar-did-mount}))
+(reagent/render-component [calendar-component]
+                          (.getElementById js/document "app"))
+
 (defn component []
   [:div
    [maps-component]])
